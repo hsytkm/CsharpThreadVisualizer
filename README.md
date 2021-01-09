@@ -34,7 +34,7 @@ Tasks just stops for the time specified in the UI.  `Thread.Sleep()`
 
 The number of execution threads sometimes exceeded the number of logical processors in Task Manager.
 
-Why? Because the `Thread.Sleep` method of the task?
+Why? Because the contents of the Task is `Thread.Sleep` method.
 
 
 
@@ -55,7 +55,7 @@ Why? Because the `Thread.Sleep` method of the task?
 大量のタスクを実行しグラフ化した。
 
 - 横軸：経過時間(ミリ秒)
-- 縦軸：スレッドID ()`Thread.CurrentThread.ManagedThreadId`)
+- 縦軸：スレッドID (`Thread.CurrentThread.ManagedThreadId`)
 
 タスクは UI で指定した 時間だけスレッドを止めるだけ。`Thread.Sleep()`
 
