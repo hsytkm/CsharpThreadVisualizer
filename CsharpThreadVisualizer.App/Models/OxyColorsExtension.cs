@@ -11,11 +11,6 @@ namespace CsharpThreadVisualizer.App.Models
         {
             OxyColors.Undefined,
             OxyColors.Transparent,
-            OxyColors.Azure,
-            OxyColors.Beige,
-            OxyColors.Bisque,
-            OxyColors.BlanchedAlmond,
-            OxyColors.Cornsilk,
         };
 
         private static readonly (string Name, OxyColor Color)[] _oxyColors =

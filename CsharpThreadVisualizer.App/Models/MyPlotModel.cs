@@ -2,14 +2,64 @@
 using OxyPlot.Annotations;
 using OxyPlot.Axes;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace CsharpThreadVisualizer.App.Models
 {
     class MyPlotModel : PlotModel
     {
-        public int AxisMilliSecondMax { get; } = 60_000;
-        public int AxisThreadMax { get; } = 255;
+        public int AxisMilliSecondMax
+        {
+            get => _axisMilliSecondMax;
+            set
+            {
+                if (_axisMilliSecondMax != value)
+                {
+                    _axisMilliSecondMax = value;
+                    var axis = this.Axes.FirstOrDefault(x => x.Position == AxisPosition.Top);
+                    if (axis is not null)
+                    {
+                        axis.Maximum = value;
+                        Refresh();
+                    }
+                }
+            }
+        }
+        private int _axisMilliSecondMax;
+
+        public int AxisThreadMax
+        {
+            get => _axisThreadMax;
+            set
+            {
+                if (_axisThreadMax != value)
+                {
+                    _axisThreadMax = value;
+                    var axis = this.Axes.FirstOrDefault(x => x.Position == AxisPosition.Left);
+                    if (axis is not null)
+                    {
+                        axis.Maximum = value;
+                        Refresh();
+                    }
+                }
+            }
+        }
+        private int _axisThreadMax;
+
+        public bool IsDarkTheme
+        {
+            get => _isDarkTheme;
+            set
+            {
+                if (_isDarkTheme != value)
+                {
+                    _isDarkTheme = value;
+                    this.PlotAreaBackground = value ? OxyColors.Gray : OxyColors.White;
+                    Refresh();
+                }
+            }
+        }
+        private bool _isDarkTheme;
 
         public MyPlotModel()
         {
@@ -34,6 +84,7 @@ namespace CsharpThreadVisualizer.App.Models
             var linearAxisVert = new LinearAxis
             {
                 Title = "Thread Id",
+                Position = AxisPosition.Left,
                 Minimum = 0,
                 Maximum = AxisThreadMax,
                 StartPosition = 1,
@@ -44,33 +95,47 @@ namespace CsharpThreadVisualizer.App.Models
             this.Axes.Add(linearAxisVert);
         }
 
-        public void AddArrows(IEnumerable<TaskLog> logs, in DateTime baseTime)
+        private void Refresh() => this.InvalidatePlot(true);   // Refresh
+
+        public void AddArrow(in DateTime baseTime, TaskLog log)
+        {
+            var arrow = GetArrowAnnotation(baseTime, log);
+
+            var lockObject = new object();
+            lock (lockObject)
+            {
+                this.Annotations.Add(arrow);
+            }
+            Refresh();
+        }
+
+        public void AddArrows(in DateTime baseTime, TaskLog[] logs)
         {
             foreach (var log in logs)
             {
-                var arrow = GetArrowAnnotation(log, baseTime);
+                var arrow = GetArrowAnnotation(baseTime, log);
                 this.Annotations.Add(arrow);
             }
-            this.InvalidatePlot(true);   // Refresh
+            Refresh();
+        }
 
-            static ArrowAnnotation GetArrowAnnotation(TaskLog log, in DateTime baseTime)
+        private static ArrowAnnotation GetArrowAnnotation(in DateTime baseTime, TaskLog log)
+        {
+            var taskId = log.Id;
+            var threadId = log.ThreadId;
+            var start = (log.StartTime - baseTime).TotalMilliseconds;
+            var end = (log.EndTime - baseTime).TotalMilliseconds;
+            ref var color = ref OxyColorsExtension.GetOxyColor(threadId);
+
+            return new ArrowAnnotation
             {
-                var taskId = log.Id;
-                var threadId = log.ThreadId;
-                var start = (log.StartTime - baseTime).TotalMilliseconds;
-                var end = (log.EndTime - baseTime).TotalMilliseconds;
-                ref var color = ref OxyColorsExtension.GetOxyColor(threadId);
-
-                return new ArrowAnnotation
-                {
-                    Color = color,
-                    TextColor = color,
-                    Text = "Task:" + taskId.ToString() + " Thread:" + threadId.ToString(),
-                    //Text = OxyColorsExtension.GetName(threadId),
-                    StartPoint = new DataPoint(start, threadId),
-                    EndPoint = new DataPoint(end, threadId),
-                };
-            }
+                Color = color,
+                TextColor = color,
+                StartPoint = new DataPoint(start, threadId),
+                EndPoint = new DataPoint(end, threadId),
+                Text = "Task" + taskId.ToString() + "@" + threadId.ToString(),
+                //Text = "Task:" + taskId.ToString() + " Thread:" + threadId.ToString() + OxyColorsExtension.GetName(threadId)
+            };
         }
 
     }

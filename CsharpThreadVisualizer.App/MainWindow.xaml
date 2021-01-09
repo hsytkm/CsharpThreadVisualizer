@@ -7,40 +7,72 @@
         xmlns:local="clr-namespace:CsharpThreadVisualizer.App"
         mc:Ignorable="d"
         ResizeMode="CanResizeWithGrip"
-        Title="Thread execution status"
+        Title="C# Thread execution status"
         Height="400" Width="800" >
 
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
     
-    <!--
-        グラフのシフト     ： 右ボタン押下で移動
-        グラフのリセット   ： 中ボタン(マウスホイール)をダブルクリック
-    -->
-    
     <DockPanel>
-        <StackPanel DockPanel.Dock="Left" Margin="5,0" >
-            <TextBlock Text="Graph" FontSize="16" FontWeight="Bold" />
+        <DockPanel DockPanel.Dock="Left" Margin="5,0" >
+            <Panel.Resources>
+                <Style x:Key="TextBoxTitleStyle" TargetType="{x:Type TextBlock}" >
+                    <Setter Property="FontSize" Value="16" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                    <Setter Property="DockPanel.Dock" Value="Top" />
+                </Style>
+                <Style TargetType="{x:Type TextBlock}" >
+                    <Setter Property="Margin" Value="5,5,0,0" />
+                    <Setter Property="DockPanel.Dock" Value="Top" />
+                </Style>
+                <Style TargetType="{x:Type TextBox}" >
+                    <Setter Property="Margin" Value="25,5,0,0" />
+                    <Setter Property="TextAlignment" Value="Right" />
+                    <Setter Property="DockPanel.Dock" Value="Top" />
+                </Style>
+            </Panel.Resources>
             
+            <TextBlock Text="Graph" Style="{StaticResource TextBoxTitleStyle}" />
+
+            <DockPanel DockPanel.Dock="Top" Margin="5,5,0,0">
+                <CheckBox DockPanel.Dock="Right"
+                          IsChecked="{Binding IsDarkTheme, Mode=TwoWay}" />
+                <TextBlock Text="Bg Gray" Style="{x:Null}"/>
+            </DockPanel>
+
             <TextBlock Text="Maximum thread" />
-            <TextBox />
+            <TextBox Text="{Binding MaximumThread, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
             
             <TextBlock Text="Maximum msec" />
-            <TextBox />
+            <TextBox Text="{Binding MaximumMSec, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
 
-            <TextBlock Text="Invoke Task" Margin="0,10,0,0" FontSize="16" FontWeight="Bold" />
+            <TextBlock Text="Invoke Task" Margin="0,10,0,0" Style="{StaticResource TextBoxTitleStyle}" />
 
             <TextBlock Text="Task count" />
-            <TextBox />
+            <TextBox Text="{Binding TaskCount, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                     IsEnabled="{Binding IsNotStarted}" />
 
             <TextBlock Text="Task.Delay (msec)" />
-            <TextBox />
+            <TextBox Text="{Binding TaskDelayMsec, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                     IsEnabled="{Binding IsNotStarted}" />
 
-            <Button Margin="5,20" Height="30"
-                    Content="Run Tasks" Command="{Binding RunTasksCommand}" />
-        </StackPanel>
+            <Button DockPanel.Dock="Top" Margin="5,15,5,5" Height="40"
+                    Content="Run Tasks" Command="{Binding RunTasksAsyncCommand}"
+                    IsEnabled="{Binding IsNotStarted}" />
+
+            <Border/>
+            <!--<TextBlock>
+                <Run Text="Graph shift" />
+                <LineBreak/>
+                <Run Text="  Right click + drag" />
+                <LineBreak/>
+                <Run Text="Graph reset" />
+                <LineBreak/>
+                <Run Text="  Middle double click" />
+            </TextBlock>-->
+        </DockPanel>
         
-        <oxyWpf:PlotView Model="{Binding MyModel, Mode=OneWay}" />
+        <oxyWpf:PlotView Margin="0,0,10,5" Model="{Binding MyModel, Mode=OneWay}" />
     </DockPanel>
 </Window>

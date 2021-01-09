@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CsharpThreadVisualizer.App.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -8,20 +9,14 @@ namespace CsharpThreadVisualizer.App.Models
 {
     class MyTasks
     {
-        public int TaskCount { get; } = 10;
-        public int TaskSleepMsec { get; } = 2000;
+        public int TaskCount { get; set; } = 10;
+        public int TaskSleepMsec { get; set; } = 2000;
 
-        public async Task<TaskLog[]> RunTasksAsync()
-        {
-            var tasks = Enumerable.Range(0, TaskCount)
-                .Select(x => SomeAsync(x, TaskSleepMsec));
+        public IEnumerable<Task<TaskLog>> GetTasks()
+            => Enumerable.Range(0, TaskCount).Select(x => SomeTask(x, TaskSleepMsec));
 
-            return await Task.WhenAll(tasks);
-        }
-
-        private static Task<TaskLog> SomeAsync(int taskId, int sleepMsec)
-        {
-            return Task.Run(() =>
+        private static Task<TaskLog> SomeTask(int taskId, int sleepMsec)
+            => new Task<TaskLog>(() =>
             {
                 var threadId = Thread.CurrentThread.ManagedThreadId;
                 var startTime = DateTime.Now;
@@ -31,7 +26,6 @@ namespace CsharpThreadVisualizer.App.Models
                 var endTime = DateTime.Now;
                 return new TaskLog(taskId, threadId, startTime, endTime);
             });
-        }
 
     }
 }
