@@ -3,14 +3,21 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:oxyWpf="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf" 
         xmlns:local="clr-namespace:CsharpThreadVisualizer.App"
         mc:Ignorable="d"
         Title="CsharpThreadVisualizer.App"
         Height="400" Width="800" >
 
+    <Window.DataContext>
+        <local:MainWindowViewModel />
+    </Window.DataContext>
+    
     <DockPanel>
         <Button DockPanel.Dock="Top"
-                Content="Run Tasks" Click="Button_Click" />
+                Content="Run Tasks" Command="{Binding RunTasksCommand}"/>
 
+        <oxyWpf:PlotView Model="{Binding MyModel, Mode=OneWay}" />
+        
     </DockPanel>
 </Window>
