@@ -6,18 +6,41 @@
         xmlns:oxyWpf="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf" 
         xmlns:local="clr-namespace:CsharpThreadVisualizer.App"
         mc:Ignorable="d"
-        Title="CsharpThreadVisualizer.App"
+        ResizeMode="CanResizeWithGrip"
+        Title="Thread execution status"
         Height="400" Width="800" >
 
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
     
+    <!--
+        グラフのシフト     ： 右ボタン押下で移動
+        グラフのリセット   ： 中ボタン(マウスホイール)をダブルクリック
+    -->
+    
     <DockPanel>
-        <Button DockPanel.Dock="Top"
-                Content="Run Tasks" Command="{Binding RunTasksCommand}"/>
+        <StackPanel DockPanel.Dock="Left" Margin="5,0" >
+            <TextBlock Text="Graph" FontSize="16" FontWeight="Bold" />
+            
+            <TextBlock Text="Maximum thread" />
+            <TextBox />
+            
+            <TextBlock Text="Maximum msec" />
+            <TextBox />
 
-        <oxyWpf:PlotView Model="{Binding MyModel, Mode=OneWay}" />
+            <TextBlock Text="Invoke Task" Margin="0,10,0,0" FontSize="16" FontWeight="Bold" />
+
+            <TextBlock Text="Task count" />
+            <TextBox />
+
+            <TextBlock Text="Task.Delay (msec)" />
+            <TextBox />
+
+            <Button Margin="5,20" Height="30"
+                    Content="Run Tasks" Command="{Binding RunTasksCommand}" />
+        </StackPanel>
         
+        <oxyWpf:PlotView Model="{Binding MyModel, Mode=OneWay}" />
     </DockPanel>
 </Window>

@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CsharpThreadVisualizer.App.Models;
 using System.Windows;
 
 namespace CsharpThreadVisualizer.App
 {
     public partial class App : Application
     {
+        public static new App Current => (App)Application.Current;
+
+        internal MyTasks MyTasks { get; } = new MyTasks();
     }
 }

@@ -10,17 +10,24 @@ namespace CsharpThreadVisualizer.App.Models
         private static readonly OxyColor[] _exclusionColors = new[]
         {
             OxyColors.Undefined,
-            OxyColors.Transparent
+            OxyColors.Transparent,
+            OxyColors.Azure,
+            OxyColors.Beige,
+            OxyColors.Bisque,
+            OxyColors.BlanchedAlmond,
+            OxyColors.Cornsilk,
         };
 
-        private static readonly OxyColor[] _oxyColors =
-            typeof(OxyColors).GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.GetField)
-                .Select(x => x.GetValue(null))
-                .Select(x => x is null ? OxyColors.Black : (OxyColor)x)
-                .Where(x => !_exclusionColors.Contains(x))
+        private static readonly (string Name, OxyColor Color)[] _oxyColors =
+            typeof(OxyColors).GetFields(BindingFlags.Static | BindingFlags.Public)
+                .Select(x => (x.Name, Color: (OxyColor)(x.GetValue(null) ?? OxyColors.Transparent)))
+                .Where(x => !_exclusionColors.Contains(x.Color))
                 .ToArray();
 
-        public static ref OxyColor FromIndex(int index)
-            => ref _oxyColors[index % _oxyColors.Length];
+        public static ref OxyColor GetOxyColor(int index)
+            => ref _oxyColors[index % _oxyColors.Length].Color;
+
+        public static string GetName(int index)
+            => _oxyColors[index % _oxyColors.Length].Name;
     }
 }
