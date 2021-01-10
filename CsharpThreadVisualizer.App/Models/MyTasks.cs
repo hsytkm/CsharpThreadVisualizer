@@ -21,7 +21,15 @@ namespace CsharpThreadVisualizer.App.Models
                 var threadId = Thread.CurrentThread.ManagedThreadId;
                 var startTime = DateTime.Now;
 
+#if true
                 Thread.Sleep(sleepMsec);
+#else
+                int sum = 0;
+                for (var i = 0; i < 10_000_000; ++i)
+                {
+                    sum += (i % 10);
+                }
+#endif
 
                 var endTime = DateTime.Now;
                 return new TaskLog(taskId, threadId, startTime, endTime);
