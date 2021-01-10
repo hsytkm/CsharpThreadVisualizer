@@ -4,6 +4,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -16,11 +17,11 @@ namespace CsharpThreadVisualizer.App
         private const int MaximumThreadDefault = 30;
 
         private const int MaximumMSecMin = 1;
-        private const int MaximumMSecMax = 60_000;
+        private const int MaximumMSecMax = 600_000;
         private const int MaximumMSecDefault = 5000;
 
         private const int TaskCountMin = 1;
-        private const int TaskCountMax = 1000;
+        private const int TaskCountMax = 10_000;
         private const int TaskCountDefault = 100;
 
         private const int TaskDelayMsecMin = 1;
@@ -168,8 +169,25 @@ namespace CsharpThreadVisualizer.App
 
         public MyPlotModel MyModel { get; } = new MyPlotModel();
 
+        public int WorkerThreadsMin { get; }
+        public int CompletionPortThreadsMin { get; }
+
         public MainWindowViewModel()
         {
+            ThreadPool.GetMaxThreads(out var workerThreads0, out var completionPortThreads0);
+            Debug.WriteLine($"ThreadPool のワーカースレッドの最大数 = {workerThreads0}");
+            Debug.WriteLine($"ThreadPool の非同期 I/O スレッドの最大数 = {completionPortThreads0}");
+
+            ThreadPool.GetAvailableThreads(out var workerThreads1, out var completionPortThreads1);
+            Debug.WriteLine($"ThreadPool のワーカースレッドの利用可能数 = {workerThreads1}");
+            Debug.WriteLine($"ThreadPool の非同期 I/O スレッドの利用可能数 = {completionPortThreads1}");
+
+            ThreadPool.GetMinThreads(out var workerThreadsMin, out var completionPortThreadsMin);
+            WorkerThreadsMin = workerThreadsMin;
+            CompletionPortThreadsMin = completionPortThreadsMin;
+            Debug.WriteLine($"ThreadPool のワーカースレッドの最小数 = {workerThreadsMin}");
+            Debug.WriteLine($"ThreadPool の非同期 I/O スレッドの最小数 = {completionPortThreadsMin}");
+
             // Model Update
             MaximumThread = MaximumThreadDefault;
             MaximumMSec = MaximumMSecDefault;
